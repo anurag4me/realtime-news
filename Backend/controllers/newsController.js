@@ -1,4 +1,5 @@
 const News = require("../models/News.js");
+const axios = require('axios');
 
 const postNews = async (req, res) => {
   try {
@@ -63,8 +64,43 @@ const loadDbNews = async (req, res) => {
   }
 };
 
+const getExternalNews = async (req, res) => {
+  const { category } = req.query;
+  try {
+    const response = await axios.get('https://newsapi.org/v2/top-headlines', {
+      params: {
+        country: 'us',
+        category: category?.toLowerCase(),
+        apiKey: process.env.NEWS_API_KEY
+      }
+    });
+    res.json({ articles: response.data.articles });
+  } catch (error) {
+    console.error('External News Error:', error.message);
+    res.status(500).json({ error: 'Failed to fetch external news' });
+  }
+};
+
+const getTrendingNews = async (req, res) => {
+  try {
+    const response = await axios.get('https://newsapi.org/v2/top-headlines', {
+      params: {
+        country: 'us',
+        pageSize: 5,
+        apiKey: process.env.NEWS_API_KEY
+      }
+    });
+    res.json({ articles: response.data.articles });
+  } catch (error) {
+    console.error('Trending News Error:', error.message);
+    res.status(500).json({ error: 'Failed to fetch trending news' });
+  }
+};
+
 module.exports = {
   loadDbNews,
   getNewsByCategory,
   postNews,
+  getExternalNews,
+  getTrendingNews
 };

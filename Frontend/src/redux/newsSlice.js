@@ -23,14 +23,10 @@ export const loadExternalNews = createAsyncThunk(
   'news/loadExternal',
   async (category = null, { rejectWithValue }) => {
     try {
-      if (!category) return []; // Don't load external news initially
+      if (!category) return [];
       
-      const res = await axios.get('https://newsapi.org/v2/top-headlines', {
-        params: {
-          country: 'us',
-          category: category.toLowerCase(),
-          apiKey: import.meta.env.VITE_NEWS_API_KEY,
-        }
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/news/external-news`, {
+        params: { category }
       });
       return res.data.articles;
     } catch (err) {
@@ -44,19 +40,14 @@ export const loadTrendingNews = createAsyncThunk(
   'news/loadTrending',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get('https://newsapi.org/v2/top-headlines', {
-        params: {
-          country: 'us',
-          pageSize: 5,
-          apiKey: import.meta.env.VITE_NEWS_API_KEY,
-        }
-      });
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/news/trending-news`);
       return res.data.articles;
     } catch (err) {
       return rejectWithValue(err.response?.data || 'Failed to load trending news');
     }
   }
 );
+
 
 const newsSlice = createSlice({
   name: 'news',
